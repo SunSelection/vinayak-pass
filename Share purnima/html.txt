@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vinayak Heights - Sharad Poonam Pass</title>
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 420px; margin: auto; background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+        h2 { color: #d32f2f; margin-bottom: 5px; }
+        h3 { color: #333; margin-top: 0; }
+        .form-group { margin: 15px 0; text-align: left; }
+        label { font-weight: bold; font-size: 14px; color: #555; }
+        input { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; background-color: #d32f2f; color: white; border: none; padding: 12px; font-size: 18px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #b71c1c; }
+        
+        #passCard { display: none; margin-top: 25px; border: 2px dashed #d32f2f; border-radius: 12px; padding: 15px; background: #fff8f8; }
+        .pass-header { background-color: #d32f2f; color: white; padding: 8px; border-radius: 6px; font-weight: bold; margin-bottom: 15px; }
+        #qrcode { display: flex; justify-content: center; margin: 15px 0; }
+        .pass-details { font-size: 16px; text-align: left; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #ffebee; }
+        .pass-details p { margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Vinayak Heights</h2>
+    <h3>?? ??? ???? ?????? ???</h3>
+
+    <div id="inputForm">
+        <div class="form-group">
+            <label>????? ?? (Flat No):</label>
+            <input type="text" id="flatNo" placeholder="??.?. 405" required>
+        </div>
+        <div class="form-group">
+            <label>?????? ?? (Mobile No):</label>
+            <input type="tel" id="mobileNo" placeholder="??.?. 7779009863" required>
+        </div>
+        <button onclick="generatePass()">??? ????? (Get My Pass)</button>
+    </div>
+
+    <div id="passCard">
+        <div class="pass-header">? ??????? ??? ??? ?</div>
+        <div class="pass-details">
+            <p><strong>????? ??:</strong> <span id="dispFlat"></span></p>
+            <p><strong>??????:</strong> <span id="dispMob"></span></p>
+            <p><strong>??????:</strong> ??? ???? ??????</p>
+        </div>
+        
+        <p style="margin-top:15px; font-size: 13px; color: #666;">??????? ??? ?? ? QR ??? ?????:</p>
+        <div id="qrcode"></div>
+        
+        <button onclick="window.print()" style="background-color:#333; font-size:14px; padding:8px;">??????? / ?????????? ??</button>
+    </div>
+</div>
+
+<script>
+    function generatePass() {
+        var flat = document.getElementById("flatNo").value.trim();
+        var mobile = document.getElementById("mobileNo").value.trim();
+
+        if (flat === "" || mobile === "") {
+            alert("???? ????? ????? ???? ??? ?????? ???? ???? ???!");
+            return;
+        }
+
+        document.getElementById("dispFlat").innerText = flat;
+        document.getElementById("dispMob").innerText = mobile;
+        document.getElementById("qrcode").innerHTML = "";
+
+        var qrData = "VINAYAK|FLAT:" + flat + "|MOB:" + mobile;
+
+        new QRCode(document.getElementById("qrcode"), {
+            text: qrData,
+            width: 180,
+            height: 180,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+
+        document.getElementById("inputForm").style.display = "none";
+        document.getElementById("passCard").style.display = "block";
+    }
+</script>
+
+</body>
+</html>
