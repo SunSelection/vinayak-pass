@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Scanner - Vinayak Heights</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        #reader { width: 100%; margin-top: 15px; }
+        #status { font-size: 20px; font-weight: bold; margin-top: 20px; padding: 15px; border-radius: 8px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .danger { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>?? Gate Pass Scanner</h2>
+    <h3>Vinayak Heights Jamanvar</h3>
+    <hr>
+    
+    <div id="reader"></div>
+    <div id="status">Scan karva mate taiyar...</div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://orrbzkrqhuumopimiamn.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_D-px1SnzTC0rNluaEbYPIA_szv"; 
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let isProcessing = false;
+
+    async function onScanSuccess(passId) {
+        if (isProcessing) return;
+        isProcessing = true;
+        
+        const statusDiv = document.getElementById('status');
+        statusDiv.className = '';
+        statusDiv.innerHTML = "Pass tapasi rahya chhiye...";
+
+        const { data: pass, error } = await _supabase
+            .from('passes')
+            .select('*')
+            .eq('id', passId)
+            .maybeSingle();
+
+        if (error || !pass) {
+            statusDiv.className = 'danger';
+            statusDiv.innerHTML = "? Khoto ke amanya pass!";
+            setTimeout(() => { isProcessing = false; }, 3000);
+            return;
+        }
+
+        if (pass.is_scanned) {
+            statusDiv.className = 'danger';
+            statusDiv.innerHTML = `? Pass vaparai gayo chhe!<br><small>Flat: ${pass.flat_no}</small>`;
+        } else {
+            await _supabase
+                .from('passes')
+                .update({ is_scanned: true })
+                .eq('id', passId);
+
+            statusDiv.className = 'success';
+            statusDiv.innerHTML = `? Entry Allowed!<br><small>Flat: ${pass.flat_no} (${pass.pass_type})</small>`;
+        }
+
+        setTimeout(() => {
+            statusDiv.className = '';
+            statusDiv.innerHTML = "Bija pass mate taiyar...";
+            isProcessing = false;
+        }, 3000);
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: { width: 250, height: 250 } });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
